@@ -1,0 +1,19 @@
+{
+  "name": "messchungkhoan",
+  "version": "1.0.0",
+  "description": "Facebook bot for ordering",
+  "main": "index.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/DolcinoRose/messchungkhoan.git"
+  },
+  "author": "Phuc.Hoang&&Dung.Bui",
+  "license": "ISC",
+  "bugs": {
+    "url": "https://github.com/DolcinoRose/messchungkhoan/issues"
+  },
+  "homepage": "https://github.com/DolcinoRose/messchungkhoan#readme"
+}
