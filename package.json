@@ -1,19 +1,31 @@
 {
-  "name": "messchungkhoan",
+  "name": "vnds-chatbot",
   "version": "1.0.0",
-  "description": "Facebook bot for ordering",
-  "main": "index.js",
+  "description": "VNDS chat bot",
+  "main": "app.js",
+  "dependencies": {
+    "body-parser": "^1.15.2",
+    "express": "^4.14.0",
+    "node-wit": "^4.0.0",
+    "request": "^2.74.0"
+  },
+  "devDependencies": {},
   "scripts": {
     "test": "echo \"Error: no test specified\" && exit 1"
   },
-  "repository": {
-    "type": "git",
-    "url": "https://github.com/DolcinoRose/messchungkhoan.git"
+  "keywords": [
+    "vnds",
+    "bot",
+    "wit",
+    "messenger"
+  ],
+  "author": "VNDS",
+  "license": "MIT",
+  "engines": {
+      "node": "6.1.0"
   },
-  "author": "Phuc.Hoang&&Dung.Bui",
-  "license": "ISC",
   "bugs": {
-    "url": "https://github.com/DolcinoRose/messchungkhoan/issues"
+    "url": "https://github.com/DolcinoRose/vnds-chatbot/issues"
   },
-  "homepage": "https://github.com/DolcinoRose/messchungkhoan#readme"
+  "homepage": "https://github.com/DolcinoRose/vnds-chatbot#readme"
 }
