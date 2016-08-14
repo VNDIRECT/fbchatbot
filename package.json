@@ -27,5 +27,9 @@
   "bugs": {
     "url": "https://github.com/DolcinoRose/vnds-chatbot/issues"
   },
-  "homepage": "https://github.com/DolcinoRose/vnds-chatbot#readme"
+  "homepage": "https://github.com/DolcinoRose/vnds-chatbot#readme",
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/DolcinoRose/vnds-chatbot.git"
+  }
 }
