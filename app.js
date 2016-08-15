@@ -19,9 +19,6 @@ var app = express();
 app.use(bodyParser.urlencoded({ extended: false }));
 app.use(bodyParser.json());
 
-// Setup bot
-// const wit = bot.getWit();
-
 // Webserver parameter
 const PORT = process.env.PORT || 8445;
 
@@ -32,7 +29,7 @@ app.get('/webhook', function(req, res) {
     	res.status(200).send(req.query['hub.challenge']);
   	} else {
     	console.error("Failed validation. Make sure the validation tokens match.");
-    	res.sendStatus(403);          
+    	res.sendStatus(403);
   	}
 });
 
@@ -45,26 +42,32 @@ app.post('/webhook', function (req, res) {
 			var intent = entities.intent[0];
 			if (intent == undefined) {
 				resultText = 'Xin lỗi, tôi chưa hiểu yêu cầu của quý khách.';
+				fb.sendTextMessage(senderId, resultText);
 			} else {
 				switch(intent.value) {
 					case 'stockInfo':
 						if (entities.symbol) {
-							resultText = bot.stockInfoProcessor(entities.symbol)
+							var stockInfoData;
+							bot.processStockInfo(entities.symbol).then(function(data){
+								stockInfoData = data;
+								resultText = stockInfoData.resultText;
+								var buttons = stockInfoData.actionButtons;
+								fb.sendButtonMessage(senderId, resultText, buttons);
+							});
 						} else {
-							resultText = 'Xin lỗi, tôi không tìm thấy mã chứng khoán này.'
+							resultText = 'Xin lỗi, tôi không tìm thấy mã chứng khoán này.';
+							fb.sendTextMessage(senderId, resultText);
 						}
 						break;
 					case 'sayHi':
-						resultText = 'Chào bạn. ;)'
+						resultText = 'Chào bạn. ;)';
+						fb.sendTextMessage(senderId, resultText);
 						break;
 					default:
 						resultText = 'Xin lỗi, tôi hiểu yêu cầu của bạn, nhưng tôi không biết phải làm gì.';
+						fb.sendTextMessage(senderId, resultText);
 				}
 			}
-			return resultText;
-		})
-		.then(function(resultText) {
-			fb.sendTextMessage(senderId, resultText);
 		});
 		res.sendStatus(200);
 	});

@@ -12,7 +12,7 @@ function witProcessor(messageText, recipientId) {
 		method: 'GET',
 		url: witUrl,
 		headers: {
-			Authorization: 'Bearer ' + config.WIT_TOKEN  
+			Authorization: 'Bearer ' + config.WIT_TOKEN
 		}
 	};
 	return rp(options).then(function(response) {
@@ -21,28 +21,40 @@ function witProcessor(messageText, recipientId) {
 	});
 }
 
-function stockInfoProcessor(symbols) {
+function processStockInfo(symbols) {
 	var symbolsString = symbols.map(function(element) {
 		return element.value;
 	}).join();
+
 	return priceService.processSymbols(symbolsString)
-	.then(function(body){
-		return JSON.parse(body);
-	})
-	.then(function(data){
-		var stockInfoMessage = '';
-		for (var index in data) {
-			var arrData = data[index].toString().split('|');
-			if (arrData.length > 0) {
-				stockInfoMessage += priceService.prepareStockInfoMessageData(arrData);
+		.then(function(body){
+			return JSON.parse(body);
+		})
+		.then(function(data){
+			var stockInfoMessage = '';
+			for (var index in data) {
+				var arrData = data[index].toString().split('|');
+				if (arrData.length > 0) {
+					stockInfoMessage += priceService.prepareStockInfoMessageData(arrData);
+				}
 			}
-		}
-		return stockInfoMessage;
-	});
-	
+			// generate buttons array for facebook buttons
+			var actionButtons = [];
+			for (var symbol in symbols) {
+				actionButtons.push({
+					type: 'web_url',
+					url: 'https://www.vndirect.com.vn/portal/tong-quan/' + symbols[symbol].value + '.shtml',
+					title: 'Xem chi tiết mã ' + symbols[symbol].value
+				});
+			}
+			return {
+				resultText: stockInfoMessage,
+				actionButtons: actionButtons
+			};
+		});
 }
 
 module.exports = {
 	witProcessor: witProcessor,
-	stockInfoProcessor: stockInfoProcessor
+	processStockInfo: processStockInfo
 }
