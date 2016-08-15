@@ -40,30 +40,8 @@ app.post('/webhook', function (req, res) {
 	var data = req.body;
 
 	fb.processRequest(req, function(message, senderId) {
-		converse(message, senderId);
-		res.sendStatus(200);
-	});
-	
-});
-
-function converse(messageText, recipientId) {
-	var witUrl = 'https://api.wit.ai/message?q=' + encodeURIComponent(messageText);
-	var options = {
-		method: 'GET',
-		url: witUrl,
-		headers: {
-			Authorization: 'Bearer ' + config.WIT_TOKEN  
-		}
-	};
-	rp(options)
-		.then(function(response) {
-			console.log(response);
-			var jsonBody = JSON.parse(response);
-			return jsonBody.entities;
-		})
-		.then(function(entities) {
+		bot.process(message, senderId).then(function(entities) {
 			var resultText = '';
-			// console.log(entities);
 			console.log(entities.intent[0].value);
 			var intent = entities.intent[0];
 			if (intent == undefined) {
@@ -91,8 +69,13 @@ function converse(messageText, recipientId) {
 			return resultText;
 		})
 		.then(function(resultText) {
-			fb.sendTextMessage(recipientId, resultText);
+			fb.sendTextMessage(senderId, resultText);
 		});
+		res.sendStatus(200);
+	});
+});
+
+
 	// request.get(options, function(error, response, body) {
 	// 	var stocks = [];
 	// 	if (response.statusCode == 200 && !error) {
@@ -170,7 +153,7 @@ function converse(messageText, recipientId) {
 	// 			break;
 	// 	}
 	// });
-}
+
 
 function prepareStockInfoMessageData(data) {
 	var resultText = '';
