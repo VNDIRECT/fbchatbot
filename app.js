@@ -4,6 +4,7 @@
 const bodyParser = require('body-parser');
 const express = require('express');
 const request = require('request');
+const rp = require('request-promise');
 
 // Load our code
 const fb = require('./facebook');
@@ -108,47 +109,107 @@ var receivedMessage = function(event) {
 }
 
 function sendTextMessage(recipientId, messageText) {
-	var url = 'https://api.wit.ai/message?q=' + encodeURIComponent(messageText);
+	var witUrl = 'https://api.wit.ai/message?q=' + encodeURIComponent(messageText);
 	var options = {
-		url: url,
+		url: witUrl,
 		headers: {
 			Authorization: 'Bearer ' + config.WIT_TOKEN  
 		}
 	};
-	console.log(url);
 	request.get(options, function(error, response, body) {
-		var resultText = 'placeholder';
+		var resultText = '';
+		var intent = '';
+		var stocks = [];
 		if (response.statusCode == 200 && !error) {
 			var jsonBody = JSON.parse(response.body);
 			if (jsonBody.entities.intent == undefined) {
-				resultText = 'I do not know what you want.'
+				resultText = 'Xin lỗi, tôi chưa hiểu yêu cầu của quý khách.'
 			} else {
-				resultText = jsonBody.entities.intent[0].value + ' on ';
-				if (jsonBody.entities.symbol.length > 0) {	
-					for (var index in jsonBody.entities.symbol) {
-						var symbol = jsonBody.entities.symbol[index].value;
+				intent = jsonBody.entities.intent[0].value;
+				stocks = jsonBody.entities.symbol;
+				resultText = 'Quý khách muốn ' + intent + ' của ';
+				if (stocks.length > 0) {	
+					for (var index in stocks) {
+						var symbol = stocks[index].value;
 						resultText += symbol;
 						resultText += ' ';
 					}
 				} else {
-					resultText = 'No symbol found.';
+					resultText = 'Không tìm thấy mã.';
 				}
 			}
 		} else {
-			resultText = 'Sorry, I do not understand.';
-		} 
-		var messageData = {
-			recipient: {
-		  		id: recipientId
-			},
-			message: {
-		  		text: resultText,
-		  		metadata: "DEVELOPER_DEFINED_METADATA"
-			}
-		};
-
+			resultText = 'Xin lỗi, tôi chưa hiểu yêu cầu của quý khách.';
+		}
+		var messageData = prepareMessageData(recipientId, resultText);
 		callSendAPI(messageData);
+		switch(intent) {
+			case 'stockInfo':
+				if (stocks.length > 0) {
+					var stockSymbolsString = stocks.map(function(element) {
+						return element.value;
+					}).join();
+					var priceServiceUri = 'https://priceservice.vndirect.com.vn/priceservice/secinfo/snapshot/q=codes:';
+					var combinedUri = priceServiceUri + stockSymbolsString;
+					var options = {
+						method: 'GET',
+						uri: combinedUri
+					}
+					rp(options)
+						.then(function(body) {
+							console.log('body ' + body);
+							return JSON.parse(body);
+						})
+						.then(function(data) {
+							console.log('data ' + data);
+							var stockInfoMessage = '';
+							for (var index in data) {
+								var arrData = data[index].toString().split('|');
+								if (arrData.length > 0) {
+									stockInfoMessage += prepareStockInfoMessageData(arrData);
+								}
+							}
+							var stockInfoMessageData = prepareMessageData(recipientId, stockInfoMessage);
+							callSendAPI(stockInfoMessageData);
+						});
+					console.log('done')
+				}
+				break;
+			default:
+				break;
+		}
 	});
+}
+
+function prepareStockInfoMessageData(data) {
+	var resultText = '';
+	var stockInfo = {
+		code: data[3],
+		ceilingPrice: data[15],
+		floorPrice: data[16],
+		matchQtty: data[20]
+	}
+	resultText += formatStockInfoData(stockInfo);
+	resultText += '\n';
+	return resultText;
+}
+function formatStockInfoData(stockInfo) {
+	return stockInfo.code + ': ' + '\n'
+		+ 'Sàn: ' + stockInfo.floorPrice + '\n'
+		+ 'Trần: ' + stockInfo.ceilingPrice + '\n'
+		+ 'KL khớp gần nhất: ' + stockInfo.matchQtty + '\n;'
+}
+
+function prepareMessageData(recipientId, text) {
+	return {
+		recipient: {
+			id: recipientId
+		},
+		message: {
+			text: text,
+			metadata: "DEVELOPER_DEFINED_METADATA"
+		}
+	};
 }
 
 function callSendAPI(messageData) {
@@ -171,7 +232,7 @@ function callSendAPI(messageData) {
 					recipientId);
 				}
 			} else {
-			  console.error(response.error);
+			  console.error('error' + response.error);
 			}
 		}
 	);  
