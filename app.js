@@ -39,159 +39,194 @@ app.get('/webhook', function(req, res) {
 app.post('/webhook', function (req, res) {
 	var data = req.body;
 
-	if (data.object == 'page') {
-		data.entry.forEach(function(pageEntry) {
-		  	var pageID = pageEntry.id;
-		  	var timeOfEvent = pageEntry.time;
-
-		  	pageEntry.messaging.forEach(function(messagingEvent) {
-		  		receivedMessage(messagingEvent);
-		    	// if (messagingEvent.optin) {
-		     //  		fb.receivedAuthentication(messagingEvent);
-		    	// } else if (messagingEvent.message) {
-		     //  		fb.receivedMessage(messagingEvent);
-		    	// } else if (messagingEvent.delivery) {
-		     //  		fb.receivedDeliveryConfirmation(messagingEvent);
-		    	// } else if (messagingEvent.postback) {
-		     //  		fb.receivedPostback(messagingEvent);
-		    	// } else if (messagingEvent.read) {
-		     //  		fb.receivedMessageRead(messagingEvent);
-		    	// } else if (messagingEvent.account_linking) {
-		     //  		fb.receivedAccountLink(messagingEvent);
-		    	// } else {
-		     //  		console.log("Webhook received unknown messagingEvent: ", messagingEvent);
-		    	// }
-		  	});
-		});
+	fb.processRequest(req, function(message, senderId) {
+		converse(message, senderId);
 		res.sendStatus(200);
-	}
+	});
+	
 });
 
-// Interaction with Facebook Messenger API
-
-var receivedMessage = function(event) {
-	var senderID = event.sender.id;
-	var recipientID = event.recipient.id;
-	var timeOfMessage = event.timestamp;
-	var message = event.message;
-
-	console.log("Received message for user %d and page %d at %d with message:", 
-	senderID, recipientID, timeOfMessage);
-	console.log(JSON.stringify(message));
-
-	var isEcho = message.is_echo;
-	var messageId = message.mid;
-	var appId = message.app_id;
-	var metadata = message.metadata;
-
-	// You may get a text or attachment but not both
-	var messageText = message.text;
-	var messageAttachments = message.attachments;
-	var quickReply = message.quick_reply;
-
-	if (isEcho) {
-		// Just logging message echoes to console
-		console.log("Received echo for message %s and app %d with metadata %s", 
-		  messageId, appId, metadata);
-		return;
-	} else if (quickReply) {
-		var quickReplyPayload = quickReply.payload;
-		console.log("Quick reply for message %s with payload %s",
-		  messageId, quickReplyPayload);
-
-		sendTextMessage(senderID, "Quick reply tapped");
-		return;
-	}
-	if (messageText) {
-		// TODO: connect to Wit.ai bot
-		sendTextMessage(senderID, messageText);
-	}
-}
-
-function sendTextMessage(recipientId, messageText) {
+function converse(messageText, recipientId) {
 	var witUrl = 'https://api.wit.ai/message?q=' + encodeURIComponent(messageText);
 	var options = {
+		method: 'GET',
 		url: witUrl,
 		headers: {
 			Authorization: 'Bearer ' + config.WIT_TOKEN  
 		}
 	};
-	request.get(options, function(error, response, body) {
-		var resultText = '';
-		var intent = '';
-		var stocks = [];
-		if (response.statusCode == 200 && !error) {
-			var jsonBody = JSON.parse(response.body);
-			if (jsonBody.entities.intent == undefined) {
-				resultText = 'Xin lỗi, tôi chưa hiểu yêu cầu của quý khách.'
+	rp(options)
+		.then(function(response) {
+			console.log(response);
+			var jsonBody = JSON.parse(response);
+			return jsonBody.entities;
+		})
+		.then(function(entities) {
+			var resultText = '';
+			// console.log(entities);
+			console.log(entities.intent[0].value);
+			var intent = entities.intent[0];
+			if (intent == undefined) {
+				resultText = 'Xin lỗi, tôi chưa hiểu yêu cầu của quý khách.';
 			} else {
-				intent = jsonBody.entities.intent[0].value;
-				stocks = jsonBody.entities.symbol;
-				resultText = 'Quý khách muốn ' + intent + ' của ';
-				if (stocks.length > 0) {	
-					for (var index in stocks) {
-						var symbol = stocks[index].value;
-						resultText += symbol;
-						resultText += ' ';
-					}
-				} else {
-					resultText = 'Không tìm thấy mã.';
+				switch(intent.value) {
+					case 'stockInfo':
+						var symbols = entities.symbol;
+						if (symbols.length > 0) {
+							for (var index in symbols) {
+								resultText += symbols[index].value;
+								resultText += ' ';
+							}
+						} else {
+							resultText = 'Xin lỗi, tôi không tìm thấy mã chứng khoán này.'
+						}
+						break;
+					case 'sayHi':
+						resultText = 'Chào bạn. ;)'
+						break;
+					default:
+						resultText = 'Xin lỗi, tôi hiểu yêu cầu của bạn, nhưng tôi không biết phải làm gì.';
 				}
 			}
-		} else {
-			resultText = 'Xin lỗi, tôi chưa hiểu yêu cầu của quý khách.';
-		}
-		var messageData = prepareMessageData(recipientId, resultText);
-		callSendAPI(messageData);
-		switch(intent) {
-			case 'stockInfo':
-				if (stocks.length > 0) {
-					var stockSymbolsString = stocks.map(function(element) {
-						return element.value;
-					}).join();
-					var priceServiceUri = 'https://priceservice.vndirect.com.vn/priceservice/secinfo/snapshot/q=codes:';
-					var combinedUri = priceServiceUri + stockSymbolsString;
-					var options = {
-						method: 'GET',
-						uri: combinedUri
-					}
-					rp(options)
-						.then(function(body) {
-							console.log('body ' + body);
-							return JSON.parse(body);
-						})
-						.then(function(data) {
-							console.log('data ' + data);
-							var stockInfoMessage = '';
-							for (var index in data) {
-								var arrData = data[index].toString().split('|');
-								if (arrData.length > 0) {
-									stockInfoMessage += prepareStockInfoMessageData(arrData);
-								}
-							}
-							var stockInfoMessageData = prepareMessageData(recipientId, stockInfoMessage);
-							callSendAPI(stockInfoMessageData);
-						});
-					console.log('done')
-				}
-				break;
-			default:
-				break;
-		}
-	});
+			return resultText;
+		})
+		.then(function(resultText) {
+			fb.sendTextMessage(recipientId, resultText);
+		});
+	// request.get(options, function(error, response, body) {
+	// 	var stocks = [];
+	// 	if (response.statusCode == 200 && !error) {
+	// 		var jsonBody = JSON.parse(response.body);
+	// 		return jsonBody.entities;
+	// 		if (jsonBody.entities.intent == undefined) {
+	// 			resultText = 'Xin lỗi, tôi chưa hiểu yêu cầu của quý khách.'
+	// 		} else {
+	// 			// intent = jsonBody.entities.intent[0].value;
+	// 			return jsonBody.entities;
+	// 		}
+	// 	}
+	// });
+	// request.get(options, function(error, response, body) {
+	// 	var resultText = '';
+	// 	var intent = '';
+	// 	var stocks = [];
+	// 	if (response.statusCode == 200 && !error) {
+	// 		var jsonBody = JSON.parse(response.body);
+	// 		if (jsonBody.entities.intent == undefined) {
+	// 			resultText = 'Xin lỗi, tôi chưa hiểu yêu cầu của quý khách.'
+	// 		} else {
+	// 			intent = jsonBody.entities.intent[0].value;
+	// 			stocks = jsonBody.entities.symbol;
+	// 			resultText = 'Quý khách muốn ' + intent + ' của ';
+
+	// 			if (stocks.length > 0) {	
+	// 				for (var index in stocks) {
+	// 					var symbol = stocks[index].value;
+	// 					resultText += symbol;
+	// 					resultText += ' ';
+	// 				}
+	// 			} else {
+	// 				resultText = 'Không tìm thấy mã.';
+	// 			}
+	// 		}
+	// 	} else {
+	// 		resultText = 'Xin lỗi, tôi chưa hiểu yêu cầu của quý khách.';
+	// 	}
+	// 	var messageData = prepareMessageData(recipientId, resultText);
+	// 	callSendAPI(messageData);
+	// 	switch(intent) {
+	// 		case 'stockInfo':
+	// 			if (stocks.length > 0) {
+	// 				var stockSymbolsString = stocks.map(function(element) {
+	// 					return element.value;
+	// 				}).join();
+	// 				var priceServiceUri = 'https://priceservice.vndirect.com.vn/priceservice/secinfo/snapshot/q=codes:';
+	// 				var combinedUri = priceServiceUri + stockSymbolsString;
+	// 				var options = {
+	// 					method: 'GET',
+	// 					uri: combinedUri
+	// 				}
+	// 				rp(options)
+	// 					.then(function(body) {
+	// 						console.log('body ' + body);
+	// 						return JSON.parse(body);
+	// 					})
+	// 					.then(function(data) {
+	// 						console.log('data ' + data);
+	// 						var stockInfoMessage = '';
+	// 						for (var index in data) {
+	// 							var arrData = data[index].toString().split('|');
+	// 							if (arrData.length > 0) {
+	// 								stockInfoMessage += prepareStockInfoMessageData(arrData);
+	// 							}
+	// 						}
+	// 						var stockInfoMessageData = prepareMessageData(recipientId, stockInfoMessage);
+	// 						callSendAPI(stockInfoMessageData);
+	// 					});
+	// 				console.log('done')
+	// 			}
+	// 			break;
+	// 		default:
+	// 			break;
+	// 	}
+	// });
 }
 
 function prepareStockInfoMessageData(data) {
 	var resultText = '';
+	var marketInfo = request.get('https://priceservice.vndirect.com.vn/priceservice/market/snapshot/q=codes:10,02,03');
+	console.log(marketInfo.body);
 	var stockInfo = {
+		floorCode: data[0],
 		code: data[3],
 		ceilingPrice: data[15],
 		floorPrice: data[16],
 		matchQtty: data[20]
+		// matchPrice: checkMatchPrice(data[0], data[19], data[12], data[11], data[39])
 	}
 	resultText += formatStockInfoData(stockInfo);
 	resultText += '\n';
 	return resultText;
+}
+
+function checkMatchPrice(floorCode, matchPrice, currentQtty, currentPrice, projectOpen, marketInfo) {
+	if (floorCode == '02' || floorCode == '03') {
+        if (currentPrice > 0) {
+            if (isInATC) {
+                return currentPrice;
+            } else if (currentQtty > 0) {
+                return currentPrice;
+            } else {
+                return 0;
+            }
+        } else {
+            return matchPrice;
+        }
+    } else if (floorCode == '10') {
+        if (isInATO || isInATC) {
+            return projectOpen;
+        } else {
+            return matchPrice;
+        }
+    }
+}
+
+function isInATO(marketInfo){
+    if (marketInfo.floorCode == "10") {
+        if (marketInfo.status == "P" || marketInfo.status == "2"){
+            return true;
+        }
+    } else {
+        return false;
+    }
+}
+
+function isInATC(marketInfo){
+    if (marketInfo.status == "A" || marketInfo.status == "9" || (marketInfo.floorCode == "02" && marketInfo.status == "30")) {
+        return true;
+    } else {
+        return false;
+    }
 }
 function formatStockInfoData(stockInfo) {
 	return stockInfo.code + ': ' + '\n'
@@ -210,32 +245,6 @@ function prepareMessageData(recipientId, text) {
 			metadata: "DEVELOPER_DEFINED_METADATA"
 		}
 	};
-}
-
-function callSendAPI(messageData) {
-	request({
-		uri: 'https://graph.facebook.com/v2.6/me/messages',
-		qs: { access_token: config.FB_PAGE_TOKEN },
-		method: 'POST',
-		json: messageData
-
-		}, function (error, response, body) {
-			if (!error && response.statusCode == 200) {
-				var recipientId = body.recipient_id;
-				var messageId = body.message_id;
-
-				if (messageId) {
-					console.log("Successfully sent message with id %s to recipient %s", 
-				  	messageId, recipientId);
-				} else {
-					console.log("Successfully called Send API for recipient %s", 
-					recipientId);
-				}
-			} else {
-			  console.error('error' + response.error);
-			}
-		}
-	);  
 }
 
 app.listen(PORT, function() {
