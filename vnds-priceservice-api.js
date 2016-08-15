@@ -17,25 +17,27 @@ function processSymbols(symbolsString) {
 
 function prepareStockInfoMessageData(data) {
 	var resultText = '';
-	// var marketInfo = request.get('https://priceservice.vndirect.com.vn/priceservice/market/snapshot/q=codes:10,02,03');
-	// console.log(marketInfo.body);
+	var marketInfoUri = 'https://priceservice.vndirect.com.vn/priceservice/market/snapshot/q=codes:10,02,03';
+	var marketInfo = request.get(marketInfoUri, function(error, response, body){
+		return JSON.parse(body);
+	});
 	var stockInfo = {
 		floorCode: data[0],
 		code: data[3],
 		ceilingPrice: data[15],
 		floorPrice: data[16],
-		matchQtty: data[20]
-		// matchPrice: checkMatchPrice(data[0], data[19], data[12], data[11], data[39])
+		matchQtty: data[20],
+		matchPrice: checkMatchPrice(data[0], data[19], data[12], data[11], data[39], marketInfo)
 	}
 	resultText += formatStockInfoData(stockInfo);
 	resultText += '\n';
 	return resultText;
 }
 
-function checkMatchPrice(floorCode, matchPrice, currentQtty, currentPrice, projectOpen) {
+function checkMatchPrice(floorCode, matchPrice, currentQtty, currentPrice, projectOpen, marketInfo) {
 	if (floorCode == '02' || floorCode == '03') {
         if (currentPrice > 0) {
-            if (isInATC) {
+            if (isInATC(marketInfo)) {
                 return currentPrice;
             } else if (currentQtty > 0) {
                 return currentPrice;
@@ -46,7 +48,7 @@ function checkMatchPrice(floorCode, matchPrice, currentQtty, currentPrice, proje
             return matchPrice;
         }
     } else if (floorCode == '10') {
-        if (isInATO || isInATC) {
+        if (isInATO(marketInfo) || isInATC(marketInfo)) {
             return projectOpen;
         } else {
             return matchPrice;
@@ -76,7 +78,8 @@ function formatStockInfoData(stockInfo) {
 	return stockInfo.code + ': ' + '\n'
 		+ 'Sàn: ' + stockInfo.floorPrice + '\n'
 		+ 'Trần: ' + stockInfo.ceilingPrice + '\n'
-		+ 'KL khớp gần nhất: ' + stockInfo.matchQtty + '\n;'
+		+ 'KL khớp gần nhất: ' + stockInfo.matchQtty + '\n'
+		+ 'Giá khớp gần nhất: ' + stockInfo.matchPrice + '\n'
 }
 
 module.exports = {
