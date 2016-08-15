@@ -15,7 +15,7 @@ function processRequest(req, callback) {
 				var timeOfMessage = event.timestamp;
 				var message = event.message;
 
-				if (message.text) {
+				if (message && message.text) {
 					callback(message.text, senderID);
 				}
 		  	});
@@ -62,7 +62,6 @@ function sendButtonMessage(recipientId, messageText, buttons) {
 }
 
 function callSendAPI(messageData) {
-	console.log(messageData.message.attachment.payload);
 	request({
 		uri: 'https://graph.facebook.com/v2.6/me/messages',
 		qs: { access_token: config.FB_PAGE_TOKEN },

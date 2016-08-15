@@ -39,7 +39,9 @@ app.post('/webhook', function (req, res) {
 	fb.processRequest(req, function(message, senderId) {
 		bot.witProcessor(message, senderId).then(function(entities) {
 			var resultText = '';
-			var intent = entities.intent[0];
+			console.log('entities');
+			console.log(entities);
+			var intent = entities.intent ? entities.intent[0] : undefined;
 			if (intent == undefined) {
 				resultText = 'Xin lỗi, tôi chưa hiểu yêu cầu của quý khách.';
 				fb.sendTextMessage(senderId, resultText);
