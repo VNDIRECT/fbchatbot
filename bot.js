@@ -32,19 +32,19 @@ function processStockInfo(symbols) {
 		})
 		.then(function(data){
 			var stockInfoMessage = '';
-			for (var index in data) {
-				var arrData = data[index].toString().split('|');
+			for (let dataItem of data) {
+				var arrData = dataItem.toString().split('|');
 				if (arrData.length > 0) {
 					stockInfoMessage += priceService.prepareStockInfoMessageData(arrData);
 				}
 			}
 			// generate buttons array for facebook buttons
 			var actionButtons = [];
-			for (var symbol in symbols) {
+			for (let symbol of symbols) {
 				actionButtons.push({
 					type: 'web_url',
-					url: 'https://www.vndirect.com.vn/portal/tong-quan/' + symbols[symbol].value + '.shtml',
-					title: 'Xem chi tiết mã ' + symbols[symbol].value
+					url: 'https://www.vndirect.com.vn/portal/tong-quan/' + symbol.value + '.shtml',
+					title: 'Xem chi tiết mã ' + symbol.value
 				});
 			}
 			return {

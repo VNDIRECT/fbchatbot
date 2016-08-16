@@ -35,7 +35,6 @@ app.get('/webhook', function(req, res) {
 
 app.post('/webhook', function (req, res) {
 	fb.processRequest(req, function(message, senderId) {
-		console.log(message, senderId);
 		bot.witProcessor(message, senderId).then(function(entities) {
 			var resultText = '';
 			var intent = entities.intent ? entities.intent[0] : undefined;

@@ -26,7 +26,7 @@ function prepareStockInfoMessageData(data) {
 		code: data[3],
 		ceilingPrice: data[15],
 		floorPrice: data[16],
-		matchQtty: data[20],
+		accumulatedVol: data[36],
 		matchPrice: checkMatchPrice(data[0], data[19], data[12], data[11], data[39], marketInfo)
 	}
 	resultText += formatStockInfoData(stockInfo);
@@ -76,10 +76,9 @@ function isInATC(marketInfo){
 
 function formatStockInfoData(stockInfo) {
 	return stockInfo.code + ': ' + '\n'
-		+ 'Sàn: ' + stockInfo.floorPrice + '\n'
-		+ 'Trần: ' + stockInfo.ceilingPrice + '\n'
-		+ 'KL khớp gần nhất: ' + stockInfo.matchQtty + '\n'
-		+ 'Giá khớp gần nhất: ' + stockInfo.matchPrice + '\n'
+		+ 'Đang khớp giá: ' + stockInfo.matchPrice + '\n'
+		+ 'Tổng KL đã khớp: ' + stockInfo.accumulatedVol * 10 + '\n'
+		+ 'Sàn: ' + stockInfo.floorPrice + ' ' + 'Trần: ' + stockInfo.ceilingPrice + '\n'
 }
 
 module.exports = {
