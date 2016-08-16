@@ -10,7 +10,7 @@
  */
 const crypto = require('crypto');
 const config = require('./config');
-
+const fb = require('./facebook');
 
 function verifyRequestSignature(req, res, buf) {
   var signature = req.headers["x-hub-signature"];
@@ -83,7 +83,6 @@ function parsePortfolioGeneralInfo(data) {
 function formattedRatio(ratio) {
   return (parseFloat(ratio) * 100).toFixed(2);
 }
-
 
 module.exports = {
   verifyRequestSignature: verifyRequestSignature,

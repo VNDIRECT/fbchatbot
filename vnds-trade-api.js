@@ -26,6 +26,7 @@ function displayAccount(accountNumber) {
 		return infoArray;
 	});
 }
+
 module.exports = {
 	displayAccount: displayAccount
 }

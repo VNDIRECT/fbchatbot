@@ -15,6 +15,8 @@ const utils = require('./utils');
 const config = require('./config');
 const sessions = config.sessions;
 
+const messageGapTime = 200;
+
 var app = express();
 app.use(bodyParser.urlencoded({ extended: false }));
 app.use(bodyParser.json());
@@ -66,17 +68,19 @@ app.post('/webhook', function (req, res) {
 							break;
 
 						case 'accountInquiry':
-							fb.sendTextMessage(senderId, `Dạ, ${user.pronounce} muốn xem tài khoản ạ, ${user.pronounce} vui lòng đợi em một lát ạ.`);
+							fb.sendTextMessage(senderId, `Dạ, ${user.pronounce} muốn xem danh mục đầu tư ạ, ${user.pronounce} vui lòng đợi em một lát ạ...`);
 							fb.pretendTyping(senderId);
 							tradeApi.displayAccount('0001032425').then(function(data) {
-								fb.sendTextMessage(senderId, data[0]);
+								setTimeout(function() {
+									fb.sendTextMessage(senderId, data[0]);
+								}, messageGapTime);
 								var count = 0;
 								for (let stockInfoDataTextItem of data[1]) {
 									count++;
 									// send facebook messages for stock info in order
-									setTimeout(function(){
+									setTimeout(function() {
 										fb.sendTextMessage(senderId, stockInfoDataTextItem);
-									}, count*100);
+									}, count*messageGapTime);
 								}
 							});
 							break;
