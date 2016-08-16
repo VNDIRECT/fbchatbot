@@ -76,9 +76,6 @@ app.post('/webhook', function (req, res) {
 						case 'accountInquiry':
 							fb.sendTextMessage(senderId, `Dạ, ${user.pronounce} muốn xem danh mục đầu tư ạ, ${user.pronounce} vui lòng đợi em một lát ạ...`);
 							fb.pretendTyping(senderId);
-							tradeApi.login('thangnt.nhtck47', 'vnds@1234').then(function(response) {
-								console.log(response);
-							});
 							tradeApi.displayAccount('0001032425').then(function(data) {
 								setTimeout(function() {
 									fb.sendTextMessage(senderId, data[0]);
@@ -95,7 +92,7 @@ app.post('/webhook', function (req, res) {
 							break;
 
 						case 'sayHi':
-							fb.sendTextMessage(senderId, `Chào ${user.pronounce} ${user.fbProfile.first_name} ạ! 😄`);
+							fb.sendTextMessage(senderId, `Chào ${user.pronounce} ${user.fbProfile.first_name} ạ! 😄 Em là Vi En Đi Mi Ni, em có thể giúp ${user.pronounce} xem giá chứng khoán, kiểm tra danh mục, đặt lệnh, tư vấn mã chứng khoán cụ thể. Rất hân hạnh được phục vụ ${user.pronounce}!`);
 							break;
 
 						case 'marketAdvice':
@@ -143,11 +140,14 @@ app.post('/webhook', function (req, res) {
 										var message = ''
 										if (textArray[0] == 'error') {
 											message = `Xin lỗi ${user.pronounce}, đặt lệnh không thành công. Em nhận được lỗi sau đây từ hệ thống: "${textArray[1]}"`
+										} else if (textArray[0] == 'success') {
+											message = textArray[1];
 										}
+
 										fb.sendTextMessage(senderId, message);
 									});
 							} else {
-								fb.sendTextMessage(senderId, `Có vẻ ${user.pronounce} đang muốn đặt lệnh phải không ạ? Mời ${user.pronounce} đặt lệnh theo cú pháp: "Đặt lệnh mua 20 (KL) VND (mã) giá 10.5 (giá tính x100)"`);
+								fb.sendTextMessage(senderId, `Có vẻ ${user.pronounce} đang muốn đặt lệnh phải không ạ? Mời ${user.pronounce} đặt lại lệnh với đầy đủ thông tin: mua/bán, khối lượng, giá, tên mã.`);
 							}
 							break;
 
