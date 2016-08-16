@@ -50,17 +50,21 @@ app.post('/webhook', function (req, res) {
 
 			bot.witProcessor(message, senderId).then(function(entities) {
 				var intent = entities.intent ? entities.intent[0] : undefined;
-				if (intent == undefined) {
-					fb.sendTextMessage(senderId, `Xin lỗi ${user.pronounce} ${user.fbProfile.first_name}, em chưa hiểu yêu cầu của ${user.pronounce}.`);
+
+				if (!intent) {
+					if (entities.symbol) { // not sure what the user's intent is, but they mentioned a symbol, so let's respond with some stock info anyway
+						bot.processStockInfo(entities.symbol).then(function(stockInfoData){
+							fb.sendButtonMessage(senderId, stockInfoData.resultText, stockInfoData.actionButtons);
+						});
+					} else {
+						fb.sendTextMessage(senderId, `Xin lỗi ${user.pronounce} ${user.fbProfile.first_name}, em chưa hiểu yêu cầu của ${user.pronounce}.`);
+					}
 				} else {
 					switch(intent.value) {
 						case 'stockInfo':
 							if (entities.symbol) {
-								var stockInfoData;
-								bot.processStockInfo(entities.symbol).then(function(data){
-									stockInfoData = data;
-									var buttons = stockInfoData.actionButtons;
-									fb.sendButtonMessage(senderId, stockInfoData.resultText, buttons);
+								bot.processStockInfo(entities.symbol).then(function(stockInfoData){
+									fb.sendButtonMessage(senderId, stockInfoData.resultText, stockInfoData.actionButtons);
 								});
 							} else {
 								fb.sendTextMessage(senderId, `Xin lỗi ${user.pronounce} ${user.fbProfile.first_name}, em không tìm thấy mã chứng khoán này.`);
