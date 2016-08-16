@@ -103,10 +103,14 @@ app.post('/webhook', function (req, res) {
 								} else if (entities.side[0].value == 'sell') {
 									side = 'bán';
 								}
-								if (Math.random() < 0.5) {
-									fb.sendTextMessage(senderId, `Có lẽ không nên ${side} mã ${entities.symbol[0].value} lúc này ${user.pronounce} ạ 🙈`);
+								if (entities.side.length == 1) {
+									if (Math.random() < 0.5) {
+										fb.sendTextMessage(senderId, `Có lẽ không nên ${side} mã ${entities.symbol[0].value} lúc này ${user.pronounce} ạ 🙈`);
+									} else {
+										fb.sendTextMessage(senderId, `Chuẩn, nên ${side} con ${entities.symbol[0].value} sớm ${user.pronounce} ạ! 👍`);
+									}
 								} else {
-									fb.sendTextMessage(senderId, `Chuẩn, nên ${side} con ${entities.symbol[0].value} sớm ${user.pronounce} ạ! 👍`);
+									fb.sendTextMessage(senderId, `Không nên mua hay bán mã ${entities.symbol[0].value} vào thời điểm này, ${user.pronounce} nên theo dõi thị trường và đưa ra quyết định sau ạ.`);
 								}
 							} else {
 								fb.sendTextMessage(senderId, `Với mã ${entities.symbol[0].value}, em nghĩ ${user.pronounce} nên tin vào trực giác của mình.`);
