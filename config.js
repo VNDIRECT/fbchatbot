@@ -12,7 +12,7 @@ if (!FB_APP_SECRET) { throw new Error('missing FB_APP_SECRET'); }
 
 var FB_VERIFY_TOKEN = process.env.FB_VERIFY_TOKEN;
 if (!FB_VERIFY_TOKEN) {
-  FB_VERIFY_TOKEN = "meddy_bot_token";
+  FB_VERIFY_TOKEN = "ok";
 }
 
 // This will contain all user sessions.

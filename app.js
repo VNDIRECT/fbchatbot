@@ -34,13 +34,10 @@ app.get('/webhook', function(req, res) {
 });
 
 app.post('/webhook', function (req, res) {
-	var data = req.body;
-
 	fb.processRequest(req, function(message, senderId) {
+		console.log(message, senderId);
 		bot.witProcessor(message, senderId).then(function(entities) {
 			var resultText = '';
-			console.log('entities');
-			console.log(entities);
 			var intent = entities.intent ? entities.intent[0] : undefined;
 			if (intent == undefined) {
 				resultText = 'Xin lỗi, tôi chưa hiểu yêu cầu của quý khách.';
