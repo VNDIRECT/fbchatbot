@@ -75,10 +75,11 @@ function isInATC(marketInfo){
 }
 
 function formatStockInfoData(stockInfo) {
-	return stockInfo.code + ': ' + '\n'
-		+ 'Đang khớp giá: ' + stockInfo.matchPrice + '\n'
-		+ 'Tổng KL đã khớp: ' + stockInfo.accumulatedVol * 10 + '\n'
-		+ 'Sàn: ' + stockInfo.floorPrice + ' ' + 'Trần: ' + stockInfo.ceilingPrice + '\n'
+	return 'Mã chứng khoán ' + stockInfo.code + ': ' + '\n'
+		+ '- Giá khớp gần nhất: ' + stockInfo.matchPrice + '\n'
+		+ '- Tổng KL đã khớp: ' + stockInfo.accumulatedVol * 10 + '\n'
+		+ '- Giá sàn: ' + stockInfo.floorPrice + '\n'
+		+ '- Giá trần: ' + stockInfo.ceilingPrice + '\n'
 }
 
 module.exports = {
