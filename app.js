@@ -66,7 +66,8 @@ app.post('/webhook', function (req, res) {
 							break;
 
 						case 'accountInquiry':
-							fb.sendTextMessage(senderId, `Dạ, ${user.pronounce} muốn xem tài khoản, có ngay ạ.`);
+							fb.sendTextMessage(senderId, `Dạ, ${user.pronounce} muốn xem tài khoản ạ, ${user.pronounce} vui lòng đợi em một lát ạ.`);
+							fb.pretendTyping(senderId);
 							tradeApi.displayAccount('0001032425').then(function(data) {
 								fb.sendTextMessage(senderId, data[0]);
 								for (let stockInfoDataTextItem of data[1]) {
@@ -76,7 +77,7 @@ app.post('/webhook', function (req, res) {
 							break;
 
 						case 'sayHi':
-							fb.sendTextMessage(senderId, `Chào ${user.pronounce} ${user.fbProfile.first_name} ạ! ;)`);
+							fb.sendTextMessage(senderId, `Chào ${user.pronounce} ${user.fbProfile.first_name} ạ! 😄`);
 							break;
 
 						default:

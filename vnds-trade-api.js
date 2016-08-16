@@ -19,7 +19,6 @@ function displayAccount(accountNumber) {
 	}
 
 	return rp(options).then(function(response) {
-		console.log('res');
 		return JSON.parse(response);
 	}).then(function(data) {
 		var portfolioGeneralInfo = utils.parsePortfolioGeneralInfo(data);

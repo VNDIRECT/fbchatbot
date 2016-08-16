@@ -55,12 +55,12 @@ function parsePortfolioStocksInfo(stocks) {
 
 function generateStockResultText(symbol, quantity, currentPrice, gainLossRatio) {
     var resultText = symbol + ' - '
-      + 'KL: ' + quantity + ' Giá: ' + currentPrice;
+      + 'KL:' + quantity + ' Giá:' + currentPrice;
 
     if (gainLossRatio < 0) {
-      resultText += ' Lỗ: ' + (gainLossRatio * -1) + '%';
+      resultText += '\n🔽-' + (gainLossRatio * -1) + '%';
     } else {
-      resultText += ' Lãi: ' + gainLossRatio + '%';
+      resultText += '\n🔼+' + gainLossRatio + '%';
     }
 
     return resultText;
@@ -68,13 +68,13 @@ function generateStockResultText(symbol, quantity, currentPrice, gainLossRatio) 
 
 function parsePortfolioGeneralInfo(data) {
   var resultText = '';
-  resultText += 'Giá trị thị trường của danh mục: ' + numberWithCommas(data.totalCurrentValue) + 'đ';
+  resultText += '💰Giá trị thị trường của danh mục: ' + numberWithCommas(data.totalCurrentValue) + 'đ';
 
   var netProfitRatio = formattedRatio(data.ratio);
   if (netProfitRatio < 0) {
-    resultText += ' Lỗ: ' + (netProfitRatio * -1) + '%';
+    resultText += '\nLỗ: 🔽-' + (netProfitRatio * -1) + '%';
   } else {
-    resultText += ' Lãi: ' + netProfitRatio + '%';
+    resultText += '\nLãi: 🔼' + netProfitRatio + '%';
   }
 
   return resultText;
