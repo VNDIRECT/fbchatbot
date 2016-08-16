@@ -70,8 +70,13 @@ app.post('/webhook', function (req, res) {
 							fb.pretendTyping(senderId);
 							tradeApi.displayAccount('0001032425').then(function(data) {
 								fb.sendTextMessage(senderId, data[0]);
+								var count = 0;
 								for (let stockInfoDataTextItem of data[1]) {
-									fb.sendTextMessage(senderId, stockInfoDataTextItem);
+									count++;
+									// send facebook messages for stock info in order
+									setTimeout(function(){
+										fb.sendTextMessage(senderId, stockInfoDataTextItem);
+									}, count*100);
 								}
 							});
 							break;
