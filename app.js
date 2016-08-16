@@ -20,7 +20,7 @@ app.use(bodyParser.urlencoded({ extended: false }));
 app.use(bodyParser.json());
 
 // Webserver parameter
-const PORT = process.env.PORT || 8445;
+const PORT = process.env.CHATBOT_PORT || 8445;
 
 app.get('/webhook', function(req, res) {
  	if (req.query['hub.mode'] === 'subscribe' &&
@@ -34,8 +34,11 @@ app.get('/webhook', function(req, res) {
 });
 
 app.post('/webhook', function (req, res) {
+	console.log('/webhook requested');
+
 	fb.processRequest(req, function(message, senderId) {
-		console.log(message, senderId);
+		fb.pretendTyping(senderId);
+
 		bot.witProcessor(message, senderId).then(function(entities) {
 			var resultText = '';
 			var intent = entities.intent ? entities.intent[0] : undefined;

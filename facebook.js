@@ -19,8 +19,10 @@ function processRequest(req, callback) {
 
 				if (message && message.text) {
 					callback(message.text, senderID);
+				} else {
+					callback('', senderID);
 				}
-		  	});
+			});
 		});
 	}
 }
@@ -87,8 +89,27 @@ function callSendAPI(messageData) {
 	);
 }
 
+const pretendTyping = (sender) => {
+	request({
+		url: 'https://graph.facebook.com/v2.6/me/messages',
+		qs: {access_token: config.FB_PAGE_TOKEN},
+		method: 'POST',
+		json: {
+			recipient: {id: sender},
+			sender_action: "typing_on"
+		}
+		}, function(error, response, body) {
+		if (error) {
+			console.log('Error sending messages: ', error);
+		} else if (response.body.error) {
+			console.log('Error: ', response.body.error);
+		}
+	});
+};
+
 module.exports = {
 	processRequest: processRequest,
 	sendTextMessage: sendTextMessage,
-	sendButtonMessage: sendButtonMessage
+	sendButtonMessage: sendButtonMessage,
+	pretendTyping: pretendTyping
 }
