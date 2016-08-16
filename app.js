@@ -37,11 +37,11 @@ app.get('/webhook', function(req, res) {
 
 app.post('/webhook', function (req, res) {
 	console.log('/webhook requested');
-	req.body.entry.forEach(function(pageEntry) {
-		pageEntry.messaging.forEach(function(messaging) {
-			console.log(messaging);
-		});
-	});
+	// req.body.entry.forEach(function(pageEntry) {
+	// 	pageEntry.messaging.forEach(function(messaging) {
+	// 		console.log(messaging);
+	// 	});
+	// });
 	fb.processRequest(req, function(message, senderId) { // we got a real message from user
 
 		fb.pretendTyping(senderId); // pretend that the bot is typing...
@@ -50,6 +50,8 @@ app.post('/webhook', function (req, res) {
 
 			bot.witProcessor(message, senderId).then(function(entities) {
 				var intent = entities.intent ? entities.intent[0] : undefined;
+
+				console.log(entities);
 
 				if (!intent) {
 					if (entities.symbol) { // not sure what the user's intent is, but they mentioned a symbol, so let's respond with some stock info anyway
@@ -91,6 +93,24 @@ app.post('/webhook', function (req, res) {
 
 						case 'sayHi':
 							fb.sendTextMessage(senderId, `Chào ${user.pronounce} ${user.fbProfile.first_name} ạ! 😄`);
+							break;
+
+						case 'marketAdvice':
+							var side;
+							if (entities.side) {
+								if (entities.side[0].value == 'buy') {
+									side = 'mua';
+								} else if (entities.side[0].value == 'sell') {
+									side = 'bán';
+								}
+								if (Math.random() < 0.5) {
+									fb.sendTextMessage(senderId, `Có lẽ không nên ${side} mã ${entities.symbol[0].value} lúc này ${user.pronounce} ạ 🙈`);
+								} else {
+									fb.sendTextMessage(senderId, `Chuẩn, nên ${side} con ${entities.symbol[0].value} sớm ${user.pronounce} ạ! 👍`);
+								}
+							} else {
+								fb.sendTextMessage(senderId, `Với mã ${entities.symbol[0].value}, em nghĩ ${user.pronounce} nên tin vào trực giác của mình.`);
+							}
 							break;
 
 						default:
