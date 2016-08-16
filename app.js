@@ -92,7 +92,7 @@ app.post('/webhook', function (req, res) {
 							break;
 
 						case 'sayHi':
-							fb.sendTextMessage(senderId, `Chào ${user.pronounce} ${user.fbProfile.first_name} ạ! 😄 Em là Vi En Đi Mi Ni, em có thể giúp ${user.pronounce} xem giá chứng khoán, kiểm tra danh mục, đặt lệnh, tư vấn mã chứng khoán cụ thể. Rất hân hạnh được phục vụ ${user.pronounce}!`);
+							fb.sendTextMessage(senderId, `⭐⭐Chào ${user.pronounce} ${user.fbProfile.first_name} ạ!⭐⭐\nEm là Maria Minh Hương, em có thể giúp ${user.pronounce} xem giá chứng khoán, kiểm tra danh mục, đặt lệnh, tư vấn mã chứng khoán cụ thể.\nRất hân hạnh được phục vụ ${user.pronounce}!`);
 							break;
 
 						case 'marketAdvice':
