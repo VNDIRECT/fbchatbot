@@ -4,7 +4,11 @@ const request = require('request');
 const config = require('./config');
 
 function processRequest(req, callback) {
-	if (req.body.object == 'page') {
+
+	const pageId = req.body.entry[0].id;
+	const userId = req.body.entry[0].messaging[0].sender.id;
+
+	if (req.body.object == 'page' && pageId != userId) {
 
 		req.body.entry.forEach(function(pageEntry) {
 
@@ -20,7 +24,7 @@ function processRequest(req, callback) {
 				if (message && message.text) {
 					callback(message.text, senderID);
 				} else {
-					callback('', senderID);
+					console.log('Received event', JSON.stringify(event));
 				}
 			});
 		});

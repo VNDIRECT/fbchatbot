@@ -35,7 +35,11 @@ app.get('/webhook', function(req, res) {
 
 app.post('/webhook', function (req, res) {
 	console.log('/webhook requested');
-
+	req.body.entry.forEach(function(pageEntry) {
+		pageEntry.messaging.forEach(function(messaging) {
+			console.log(messaging);
+		});
+	});
 	fb.processRequest(req, function(message, senderId) {
 		fb.pretendTyping(senderId);
 
@@ -71,8 +75,8 @@ app.post('/webhook', function (req, res) {
 				}
 			}
 		});
-		res.sendStatus(200);
 	});
+	res.sendStatus(200);
 });
 
 app.listen(PORT, function() {
