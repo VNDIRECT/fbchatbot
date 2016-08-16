@@ -68,7 +68,7 @@ function generateStockResultText(symbol, quantity, currentPrice, gainLossRatio) 
 
 function parsePortfolioGeneralInfo(data) {
   var resultText = '';
-  resultText += '💰Giá trị thị trường của danh mục: ' + numberWithCommas(data.totalCurrentValue) + 'đ';
+  resultText += 'Giá trị thị trường của danh mục: ' + numberWithCommas(data.totalCurrentValue) + 'đ💰';
 
   var netProfitRatio = formattedRatio(data.ratio);
   if (netProfitRatio < 0) {
