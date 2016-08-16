@@ -64,15 +64,28 @@ app.post('/webhook', function (req, res) {
 								fb.sendTextMessage(senderId, `Xin lỗi ${user.pronounce} ${user.fbProfile.first_name}, em không tìm thấy mã chứng khoán này.`);
 							}
 							break;
+
+						case 'accountInquiry':
+							resultText = 'Quý khách muốn xem tài khoản, ok.';
+							fb.sendTextMessage(senderId, resultText);
+							tradeApi.displayAccount('0001032425').then(function(data) {
+								fb.sendTextMessage(senderId, data[0]);
+								for (let stockInfoDataTextItem of data[1]) {
+									fb.sendTextMessage(senderId, stockInfoDataTextItem);
+								}
+							});
+							break;
+
 						case 'sayHi':
 							fb.sendTextMessage(senderId, `Chào ${user.pronounce} ${user.fbProfile.first_name} ạ! ;)`);
 							break;
+
 						default:
 							fb.sendTextMessage(senderId, `Xin lỗi, em hiểu yêu cầu của ${user.pronounce}, nhưng em không biết phải làm gì.`);
 					}
 				}
 			}).catch(function() {
-				fb.sendTextMessage(senderId, `Não em đang bị tê tê, mong ${user.pronounce} thông cảm.`);
+				fb.sendTextMessage(senderId, `Em chưa hiểu ý ${user.pronounce} ${user.fbProfile.first_name}, ${user.pronounce} có thể nói rõ hơn được không ạ?`);
 			});
 
 		});
