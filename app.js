@@ -66,8 +66,7 @@ app.post('/webhook', function (req, res) {
 							break;
 
 						case 'accountInquiry':
-							resultText = 'Quý khách muốn xem tài khoản, ok.';
-							fb.sendTextMessage(senderId, resultText);
+							fb.sendTextMessage(senderId, `Dạ, ${user.pronounce} muốn xem tài khoản, có ngay ạ.`);
 							tradeApi.displayAccount('0001032425').then(function(data) {
 								fb.sendTextMessage(senderId, data[0]);
 								for (let stockInfoDataTextItem of data[1]) {
