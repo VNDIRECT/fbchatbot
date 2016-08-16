@@ -34,7 +34,59 @@ function verifyRequestSignature(req, res, buf) {
   }
 }
 
+function numberWithCommas(x) {
+    var parts = x.toString().split(".");
+    parts[0] = parts[0].replace(/\B(?=(\d{3})+(?!\d))/g, ",");
+    return parts.join(".");
+}
+
+function parsePortfolioStocksInfo(stocks) {
+  var resultTextArray = [];
+  for (let stock of stocks) {
+    var symbol = stock.symbol;
+    var quantity = stock.quantity;
+    var currentPrice = parseFloat(stock.currentPrice) / 1000;
+    var gainLossRatio = formattedRatio(stock.gainLossRatio);
+
+    resultTextArray.push(generateStockResultText(symbol, quantity, currentPrice, gainLossRatio));
+  }
+  return resultTextArray;
+}
+
+function generateStockResultText(symbol, quantity, currentPrice, gainLossRatio) {
+    var resultText = symbol + ' - '
+      + 'KL: ' + quantity + ' Giá: ' + currentPrice;
+
+    if (gainLossRatio < 0) {
+      resultText += ' Lỗ: ' + (gainLossRatio * -1) + '%';
+    } else {
+      resultText += ' Lãi: ' + gainLossRatio + '%';
+    }
+
+    return resultText;
+}
+
+function parsePortfolioGeneralInfo(data) {
+  var resultText = '';
+  resultText += 'Giá trị thị trường của danh mục: ' + numberWithCommas(data.totalCurrentValue) + 'đ';
+
+  var netProfitRatio = formattedRatio(data.ratio);
+  if (netProfitRatio < 0) {
+    resultText += ' Lỗ: ' + (netProfitRatio * -1) + '%';
+  } else {
+    resultText += ' Lãi: ' + netProfitRatio + '%';
+  }
+
+  return resultText;
+}
+
+function formattedRatio(ratio) {
+  return (parseFloat(ratio) * 100).toFixed(2);
+}
+
 
 module.exports = {
-  verifyRequestSignature: verifyRequestSignature
+  verifyRequestSignature: verifyRequestSignature,
+  parsePortfolioStocksInfo: parsePortfolioStocksInfo,
+  parsePortfolioGeneralInfo: parsePortfolioGeneralInfo
 };

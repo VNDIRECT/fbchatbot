@@ -69,6 +69,16 @@ app.post('/webhook', function (req, res) {
 						resultText = 'Chào bạn. ;)';
 						fb.sendTextMessage(senderId, resultText);
 						break;
+					case 'accountInquiry':
+						resultText = 'Quý khách muốn xem tài khoản, ok.';
+						fb.sendTextMessage(senderId, resultText);
+						tradeApi.displayAccount('0001032425').then(function(data) {
+							fb.sendTextMessage(senderId, data[0]);
+							for (let stockInfoDataTextItem of data[1]) {
+								fb.sendTextMessage(senderId, stockInfoDataTextItem);
+							}
+						});
+						break;
 					default:
 						resultText = 'Xin lỗi, tôi hiểu yêu cầu của bạn, nhưng tôi không biết phải làm gì.';
 						fb.sendTextMessage(senderId, resultText);
