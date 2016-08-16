@@ -2,6 +2,8 @@
 
 const request = require('request');
 const config = require('./config');
+const sessions = config.sessions;
+const rp = require('request-promise');
 
 function processRequest(req, callback) {
 
@@ -96,7 +98,7 @@ function callSendAPI(messageData) {
 const pretendTyping = (sender) => {
 	request({
 		url: 'https://graph.facebook.com/v2.6/me/messages',
-		qs: {access_token: config.FB_PAGE_TOKEN},
+		qs: { access_token: config.FB_PAGE_TOKEN },
 		method: 'POST',
 		json: {
 			recipient: {id: sender},
@@ -111,9 +113,51 @@ const pretendTyping = (sender) => {
 	});
 };
 
+// get user's name, gender...
+const findOrCreateUserSessionInfo = (fbid) => {
+	return new Promise(function(resolve, reject) {
+		let sessionId;
+
+		// let's see if we already have a session for the user fbid
+		Object.keys(sessions).forEach(k => {
+			if (sessions[k].fbid === fbid) {
+				sessionId = k;
+				resolve(sessions[sessionId]);
+			}
+		});
+
+		if (!sessionId) { // no session found for user fbid, let's create a new one
+			rp({
+				method: 'GET',
+				url: 'https://graph.facebook.com/v2.6/' + fbid,
+				qs: {
+					access_token: config.FB_PAGE_TOKEN,
+					fields: 'first_name,last_name,profile_pic,locale,timezone,gender'
+				}
+			}).then(function(data) {
+				sessionId = new Date().toISOString();
+				data = JSON.parse(data);
+				let userData = {fbid: fbid, context: {}, fbProfile: data};
+				if (userData.fbProfile.gender == 'male') {
+					userData.pronounce = 'anh';
+				} else if (userData.fbProfile.gender == 'female') {
+					userData.pronounce = 'chị';
+				} else {
+					userData.pronounce = 'bạn';
+				}
+				sessions[sessionId] = userData;
+				resolve(sessions[sessionId]);
+			}).catch(function(data) {
+				reject(data);
+			});
+		}
+	});
+}
+
 module.exports = {
 	processRequest: processRequest,
 	sendTextMessage: sendTextMessage,
 	sendButtonMessage: sendButtonMessage,
-	pretendTyping: pretendTyping
+	pretendTyping: pretendTyping,
+	findOrCreateUserSessionInfo: findOrCreateUserSessionInfo
 }

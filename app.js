@@ -23,14 +23,14 @@ app.use(bodyParser.json());
 const PORT = process.env.CHATBOT_PORT || 8445;
 
 app.get('/webhook', function(req, res) {
- 	if (req.query['hub.mode'] === 'subscribe' &&
-    	req.query['hub.verify_token'] === config.FB_VERIFY_TOKEN) {
-    	console.log("Validating webhook");
-    	res.status(200).send(req.query['hub.challenge']);
-  	} else {
-    	console.error("Failed validation. Make sure the validation tokens match.");
-    	res.sendStatus(403);
-  	}
+	if (req.query['hub.mode'] === 'subscribe' &&
+		req.query['hub.verify_token'] === config.FB_VERIFY_TOKEN) {
+		console.log("Validating webhook");
+		res.status(200).send(req.query['hub.challenge']);
+	} else {
+		console.error("Failed validation. Make sure the validation tokens match.");
+		res.sendStatus(403);
+	}
 });
 
 app.post('/webhook', function (req, res) {
@@ -40,40 +40,41 @@ app.post('/webhook', function (req, res) {
 			console.log(messaging);
 		});
 	});
-	fb.processRequest(req, function(message, senderId) {
-		fb.pretendTyping(senderId);
+	fb.processRequest(req, function(message, senderId) { // we got a real message from user
 
-		bot.witProcessor(message, senderId).then(function(entities) {
-			var resultText = '';
-			var intent = entities.intent ? entities.intent[0] : undefined;
-			if (intent == undefined) {
-				resultText = 'Xin lỗi, tôi chưa hiểu yêu cầu của quý khách.';
-				fb.sendTextMessage(senderId, resultText);
-			} else {
-				switch(intent.value) {
-					case 'stockInfo':
-						if (entities.symbol) {
-							var stockInfoData;
-							bot.processStockInfo(entities.symbol).then(function(data){
-								stockInfoData = data;
-								resultText = stockInfoData.resultText;
-								var buttons = stockInfoData.actionButtons;
-								fb.sendButtonMessage(senderId, resultText, buttons);
-							});
-						} else {
-							resultText = 'Xin lỗi, tôi không tìm thấy mã chứng khoán này.';
-							fb.sendTextMessage(senderId, resultText);
-						}
-						break;
-					case 'sayHi':
-						resultText = 'Chào bạn. ;)';
-						fb.sendTextMessage(senderId, resultText);
-						break;
-					default:
-						resultText = 'Xin lỗi, tôi hiểu yêu cầu của bạn, nhưng tôi không biết phải làm gì.';
-						fb.sendTextMessage(senderId, resultText);
+		fb.pretendTyping(senderId); // pretend that the bot is typing...
+
+		fb.findOrCreateUserSessionInfo(senderId).then(function(user) { // get user session info, including his facebook's profile
+
+			bot.witProcessor(message, senderId).then(function(entities) {
+				var intent = entities.intent ? entities.intent[0] : undefined;
+				if (intent == undefined) {
+					fb.sendTextMessage(senderId, `Xin lỗi ${user.pronounce} ${user.fbProfile.first_name}, em chưa hiểu yêu cầu của ${user.pronounce}.`);
+				} else {
+					switch(intent.value) {
+						case 'stockInfo':
+							if (entities.symbol) {
+								var stockInfoData;
+								bot.processStockInfo(entities.symbol).then(function(data){
+									stockInfoData = data;
+									var buttons = stockInfoData.actionButtons;
+									fb.sendButtonMessage(senderId, stockInfoData.resultText, buttons);
+								});
+							} else {
+								fb.sendTextMessage(senderId, `Xin lỗi ${user.pronounce} ${user.fbProfile.first_name}, em không tìm thấy mã chứng khoán này.`);
+							}
+							break;
+						case 'sayHi':
+							fb.sendTextMessage(senderId, `Chào ${user.pronounce} ${user.fbProfile.first_name} ạ! ;)`);
+							break;
+						default:
+							fb.sendTextMessage(senderId, `Xin lỗi, em hiểu yêu cầu của ${user.pronounce}, nhưng em không biết phải làm gì.`);
+					}
 				}
-			}
+			}).catch(function() {
+				fb.sendTextMessage(senderId, `Não em đang bị tê tê, mong ${user.pronounce} thông cảm.`);
+			});
+
 		});
 	});
 	res.sendStatus(200);
