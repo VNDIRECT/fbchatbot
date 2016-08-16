@@ -75,7 +75,7 @@ function isInATC(marketInfo){
 }
 
 function formatStockInfoData(stockInfo) {
-	return 'Mã chứng khoán ' + stockInfo.code + ': ' + '\n'
+	return stockInfo.code + ': ' + '\n'
 		+ '- Giá khớp gần nhất: ' + stockInfo.matchPrice + '\n'
 		+ '- Tổng KL đã khớp: ' + stockInfo.accumulatedVol * 10 + '\n'
 		+ '- Giá sàn: ' + stockInfo.floorPrice + '\n'

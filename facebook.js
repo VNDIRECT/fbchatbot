@@ -89,7 +89,9 @@ function callSendAPI(messageData) {
 					console.log("Successfully called Send API for recipient %s", recipientId);
 				}
 			} else {
-
+				console.log(error);
+				console.log(response);
+				console.log(body);
 			}
 		}
 	);
