@@ -22,7 +22,7 @@ app.use(bodyParser.urlencoded({ extended: false }));
 app.use(bodyParser.json());
 
 // Webserver parameter
-const PORT = process.env.CHATBOT_PORT || 8445;
+const PORT = process.env.PORT || 8445;
 
 app.get('/webhook', function(req, res) {
 	if (req.query['hub.mode'] === 'subscribe' &&
