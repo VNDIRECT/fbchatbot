@@ -88,7 +88,7 @@ app.post('/webhook', function (req, res) {
 
 						//TODO: switch to a formal greeting line.
 						case 'sayHi':
-							fb.sendTextMessage(senderId, `⭐⭐Chào ${user.pronounce} ${user.fbProfile.first_name} ạ!⭐⭐\nEm là Maria Minh Hương, em có thể giúp ${user.pronounce} xem giá chứng khoán, kiểm tra danh mục, đặt lệnh, tư vấn mã chứng khoán cụ thể.\nRất hân hạnh được phục vụ ${user.pronounce}!`);
+							fb.sendTextMessage(senderId, `⭐⭐Chào ${user.pronounce} ${user.fbProfile.first_name} ạ!⭐⭐\nEm là Maria Minh Hương, em có thể giúp ${user.pronounce} xem giá chứng khoán, giá dầu, vàng, tỷ giá.\nRất hân hạnh được phục vụ ${user.pronounce}!`);
 							break;
 
 						// TODO: fix with real market advice in the future
