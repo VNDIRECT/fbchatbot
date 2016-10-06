@@ -11,6 +11,7 @@ const fb = require('./facebook');
 const bot = require('./bot');
 const tradeApi = require('./vnds-trade-api');
 const priceApi = require('./vnds-priceservice-api');
+const tygiaApi = require('./tygia-api');
 const utils = require('./utils');
 const config = require('./config');
 const sessions = config.sessions;
@@ -68,28 +69,60 @@ app.post('/webhook', function (req, res) {
 							}
 							break;
 
-						case 'accountInquiry':
-							fb.sendTextMessage(senderId, `Dạ, ${user.pronounce} muốn xem danh mục đầu tư ạ, ${user.pronounce} vui lòng đợi em một lát ạ...`);
-							fb.pretendTyping(senderId);
-							tradeApi.displayAccount('0001032425').then(function(data) {
-								setTimeout(function() {
-									fb.sendTextMessage(senderId, data[0]);
-								}, messageGapTime);
-								var count = 0;
-								for (let stockInfoDataTextItem of data[1]) {
-									count++;
-									// send facebook messages for stock info in order
-									setTimeout(function() {
-										fb.sendTextMessage(senderId, stockInfoDataTextItem);
-									}, count*messageGapTime);
-								}
-							});
-							break;
-
 						//TODO: switch to a formal greeting line.
 						case 'sayHi':
-							fb.sendTextMessage(senderId, `⭐⭐Chào ${user.pronounce} ${user.fbProfile.first_name} ạ!⭐⭐\nEm là Maria Minh Hương, em có thể giúp ${user.pronounce} xem giá chứng khoán, giá dầu, vàng, tỷ giá.\nRất hân hạnh được phục vụ ${user.pronounce}!`);
+							fb.sendTextMessage(senderId, `⭐⭐Chào ${user.pronounce} ${user.fbProfile.first_name} ạ!⭐⭐\nEm là Lan Hương, dịch vụ trả lời tự động của VNDIRECT. Em có thể giúp ${user.pronounce} xem giá chứng khoán, giá dầu, giá vàng.\nRất hân hạnh được phục vụ ${user.pronounce}!`);
 							break;
+
+						case 'commoditiesPrice':
+
+							if (entities.commodity) {
+								if (entities.commodity[0].value == 'oil') {
+									tygiaApi.getOilPrice().then(function(oilPrice) {
+										fb.sendTextMessage(senderId, `Giá dầu tại thời điểm này đang là ${oilPrice} USD/thùng ạ.`);
+									}, function() {
+										fb.sendTextMessage(senderId, `Xin lỗi, em chưa lấy được giá dầu ạ 😞. Xin ${user.pronounce} vui lòng thử lại sau một chút nữa.`);
+									});
+
+								} else if (entities.commodity[0].value == 'gold') {
+									tygiaApi.getGoldPrice().then(function(goldPrice) {
+										fb.sendTextMessage(senderId, `Giá vàng thế giới:\n` +
+											`- Mua: ${goldPrice.world.buy} USD/oz\n` +
+											`- Bán: ${goldPrice.world.sell} USD/oz\n\n` +
+											`SJC Hà Nội:\n` +
+											`- Mua: ${goldPrice.sjcHanoi.buy} ₫\n` +
+											`- Bán: ${goldPrice.sjcHanoi.sell} ₫\n\n` +
+											`SJC Hồ Chí Minh:\n` +
+											`- Mua: ${goldPrice.sjcHcm.buy} ₫\n` +
+											`- Bán: ${goldPrice.sjcHcm.sell} ₫\n\n` +
+											`SJC Bảo Tín Minh Châu:\n` +
+											`- Mua: ${goldPrice.sjcBtmc.buy} ₫\n` +
+											`- Bán: ${goldPrice.sjcBtmc.sell} ₫`);
+									}, function() {
+										fb.sendTextMessage(senderId, `Xin lỗi, em chưa lấy được dữ liệu giá vàng ạ 😞. Xin ${user.pronounce} vui lòng thử lại sau một chút nữa.`);
+									});
+								}
+							}
+							break;
+
+						// TODO: login then query real account data
+						// case 'accountInquiry':
+						// 	fb.sendTextMessage(senderId, `Dạ, ${user.pronounce} muốn xem danh mục đầu tư ạ, ${user.pronounce} vui lòng đợi em một lát ạ...`);
+						// 	fb.pretendTyping(senderId);
+						// 	tradeApi.displayAccount('0001032425').then(function(data) {
+						// 		setTimeout(function() {
+						// 			fb.sendTextMessage(senderId, data[0]);
+						// 		}, messageGapTime);
+						// 		var count = 0;
+						// 		for (let stockInfoDataTextItem of data[1]) {
+						// 			count++;
+						// 			// send facebook messages for stock info in order
+						// 			setTimeout(function() {
+						// 				fb.sendTextMessage(senderId, stockInfoDataTextItem);
+						// 			}, count*messageGapTime);
+						// 		}
+						// 	});
+						// 	break;
 
 						// TODO: fix with real market advice in the future
 						// case 'marketAdvice':
