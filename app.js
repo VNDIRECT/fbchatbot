@@ -55,7 +55,7 @@ app.post('/webhook', function (req, res) {
 							fb.sendButtonMessage(senderId, stockInfoData.resultText, stockInfoData.actionButtons);
 						});
 					} else {
-						fb.sendTextMessage(senderId, `Xin lỗi ${user.pronounce} ${user.fbProfile.first_name}, em chưa hiểu yêu cầu của ${user.pronounce}.`);
+						fb.sendTextMessage(senderId, `Xin lỗi ${user.pronounce} ${user.fbProfile.first_name}, em chưa hiểu yêu cầu của ${user.pronounce}. Em có thể giúp ${user.pronounce} xem giá chứng khoán, giá dầu, giá vàng.\nEm rất mong được phục vụ ${user.pronounce}!`);
 					}
 				} else {
 					switch(intent.value) {
@@ -184,7 +184,7 @@ app.post('/webhook', function (req, res) {
 						// 	break;
 
 						default:
-							fb.sendTextMessage(senderId, `Xin lỗi, em hiểu yêu cầu của ${user.pronounce}, nhưng em không biết phải làm gì.`);
+							fb.sendTextMessage(senderId, `Xin lỗi ${user.pronounce} ${user.fbProfile.first_name}, em chưa có khả năng đáp ứng yêu cầu này của ${user.pronounce}. Xin ${user.pronounce} đợi đến các phiên bản nâng cấp tiếp theo của em nhé!`);
 							break;
 					}
 				}
