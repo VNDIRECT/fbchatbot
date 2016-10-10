@@ -69,9 +69,24 @@ app.post('/webhook', function (req, res) {
 							}
 							break;
 
-						//TODO: switch to a formal greeting line.
 						case 'sayHi':
 							fb.sendTextMessage(senderId, `⭐⭐Chào ${user.pronounce} ${user.fbProfile.first_name} ạ!⭐⭐\nEm là Lan Hương, dịch vụ trả lời tự động của VNDIRECT. Em có thể giúp ${user.pronounce} xem giá chứng khoán, giá dầu, giá vàng.\nRất hân hạnh được phục vụ ${user.pronounce}!`);
+							break;
+
+						case 'compliment':
+							fb.sendTextMessage(senderId, `Cám ơn ${user.pronounce} ${user.fbProfile.first_name} ạ! Em mong được phục vụ ${user.pronounce} thường xuyên và được ${user.pronounce} giới thiệu với bạn bè nữa ạ! 😋`);
+							break;
+
+						case 'complain':
+							fb.sendTextMessage(senderId, `😞 Xin lỗi ${user.pronounce} ${user.fbProfile.first_name} ạ, khả năng của em vẫn còn khá hạn chế. Em đang học hỏi để có thể đáp ứng các yêu cầu của ${user.pronounce} tốt hơn.\nTrong lúc đó, ${user.pronounce} có thể liên hệ với hotline của VNDIRECT theo số 1900-5454-09 ạ.`);
+							break;
+
+						case 'goodbye':
+							fb.sendTextMessage(senderId, `Bye bye ${user.pronounce} ${user.fbProfile.first_name}! Khi nào cần, ${user.pronounce} lại nhắn tin cho em nhé!`);
+							break;
+
+						case 'thank':
+							fb.sendTextMessage(senderId, `Không có gì đâu ạ, em rất vui được phục vụ ${user.pronounce}!`);
 							break;
 
 						case 'commoditiesPrice':
