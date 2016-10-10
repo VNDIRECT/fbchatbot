@@ -43,7 +43,7 @@ function processStockInfo(symbols) {
 			for (let symbol of symbols) {
 				actionButtons.push({
 					type: 'web_url',
-					url: 'https://www.vndirect.com.vn/portal/tong-quan/' + symbol.value + '.shtml',
+					url: 'https://banggia.vndirect.com.vn/chung-khoan/mobile/co-phieu/' + symbol.value.toUpperCase(),
 					title: 'Xem chi tiết mã ' + symbol.value
 				});
 			}
