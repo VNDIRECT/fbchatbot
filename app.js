@@ -85,6 +85,10 @@ app.post('/webhook', function (req, res) {
 							fb.sendTextMessage(senderId, `Bye bye ${user.pronounce} ${user.fbProfile.first_name}! Khi nào cần, ${user.pronounce} lại nhắn tin cho em nhé!`);
 							break;
 
+						case 'whoAreYou':
+							fb.sendTextMessage(senderId, `Em là Lan Hương, dịch vụ trả lời tự động của VNDIRECT. Em có thể giúp ${user.pronounce} xem giá chứng khoán, giá dầu, giá vàng.\nRất hân hạnh được phục vụ ${user.pronounce}!`);
+							break;
+
 						case 'thank':
 							fb.sendTextMessage(senderId, `Không có gì đâu ạ, em rất vui được phục vụ ${user.pronounce}!`);
 							break;
