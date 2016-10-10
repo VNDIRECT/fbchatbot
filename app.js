@@ -203,12 +203,12 @@ app.post('/webhook', function (req, res) {
 						// 	break;
 
 						default:
-							fb.sendTextMessage(senderId, `Xin lỗi ${user.pronounce} ${user.fbProfile.first_name}, em chưa có khả năng đáp ứng yêu cầu này của ${user.pronounce}. Xin ${user.pronounce} đợi đến các phiên bản nâng cấp tiếp theo của em nhé!`);
+							fb.sendTextMessage(senderId, `Xin lỗi ${user.pronounce} ${user.fbProfile.first_name}, em chưa có khả năng đáp ứng yêu cầu này của ${user.pronounce}. Xin ${user.pronounce} vui lòng liên hệ với hotline của VNDIRECT theo số 1900-5454-09 hoặc email support@vndirect.com.vn để được trợ giúp ạ.`);
 							break;
 					}
 				}
 			}).catch(function() {
-				fb.sendTextMessage(senderId, `Em chưa hiểu ý ${user.pronounce} ${user.fbProfile.first_name}, ${user.pronounce} có thể nói rõ hơn được không ạ?`);
+				fb.sendTextMessage(senderId, `Em chưa hiểu ý ${user.pronounce} ${user.fbProfile.first_name}, ${user.pronounce} có thể nói rõ hơn được không ạ? ${user.pronounce} cũng có thể liên hệ với hotline của VNDIRECT theo số 1900-5454-09 hoặc email support@vndirect.com.vn để được trợ giúp tốt hơn ạ.`);
 			});
 
 		});
