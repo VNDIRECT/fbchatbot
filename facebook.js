@@ -1,4 +1,4 @@
-// Interaction with Facebook Messenger API'
+// Interaction with Facebook Messenger API
 
 const request = require('request');
 const config = require('./config');
@@ -142,10 +142,13 @@ const findOrCreateUserSessionInfo = (fbid) => {
 				let userData = {fbid: fbid, context: {}, fbProfile: data};
 				if (userData.fbProfile.gender == 'male') {
 					userData.pronounce = 'anh';
+					userData.Pronounce = 'Anh';
 				} else if (userData.fbProfile.gender == 'female') {
 					userData.pronounce = 'chị';
+					userData.Pronounce = 'Chị';
 				} else {
 					userData.pronounce = 'bạn';
+					userData.Pronounce = 'Bạn';
 				}
 				sessions[sessionId] = userData;
 				resolve(sessions[sessionId]);

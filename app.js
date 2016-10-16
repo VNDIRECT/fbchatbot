@@ -216,6 +216,34 @@ app.post('/webhook', function (req, res) {
 	res.sendStatus(200);
 });
 
+// handles a notify request from a notification server - someone's wanting us to reach out to an user to say something
+app.get('/notify', function (req, res) {
+	res.status(200).send();
+
+	switch(req.query.type) {
+		case 'priceWatch':
+			var priceMovement;
+			switch(req.query.mode) {
+				case 'lte':
+				case 'lt':
+					priceMovement = 'giảm qua'
+					break;
+				case 'gte':
+				case 'gt':
+					priceMovement = 'tăng qua'
+					break;
+			}
+			fb.sendTextMessage(req.query.fbId, `Giá ${req.query.symbol} vừa ${priceMovement} ngưỡng ${req.query.price}.`);
+			bot.processStockInfo([{value: req.query.symbol}]).then(function(stockInfoData){
+				fb.sendButtonMessage(req.query.fbId, stockInfoData.resultText, stockInfoData.actionButtons);
+			});
+			break;
+	}
+
+	console.log(req.query);
+
+});
+
 app.listen(PORT, function() {
 	console.log('Listening on port ' + PORT);
 });
