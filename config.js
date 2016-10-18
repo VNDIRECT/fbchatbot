@@ -15,6 +15,9 @@ if (!FB_VERIFY_TOKEN) {
   FB_VERIFY_TOKEN = "ok";
 }
 
+const APP_URL = process.env.APP_URL;
+if (!APP_URL) { throw new Error('missing APP_URL'); }
+
 // This will contain all user sessions.
 // Each session has an entry:
 // sessionId -> {fbid: facebookUserId, context: sessionState}
@@ -25,6 +28,7 @@ module.exports = {
   FB_PAGE_TOKEN: FB_PAGE_TOKEN,
   FB_APP_SECRET: FB_APP_SECRET,
   FB_VERIFY_TOKEN: FB_VERIFY_TOKEN,
+  APP_URL: APP_URL,
   sessions: sessions
 };
 

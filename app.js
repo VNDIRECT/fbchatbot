@@ -11,6 +11,7 @@ const fb = require('./facebook');
 const bot = require('./bot');
 const tradeApi = require('./vnds-trade-api');
 const priceApi = require('./vnds-priceservice-api');
+const priceWatchApi = require('./vnds-pricewatch-api');
 const tygiaApi = require('./tygia-api');
 const utils = require('./utils');
 const config = require('./config');
@@ -124,6 +125,24 @@ app.post('/webhook', function (req, res) {
 							}
 							break;
 
+						case 'priceAlert':
+							var mode, modeLiteral, symbol, price;
+							if (entities.side[0].value == 'over') {
+								mode = 'gte';
+								modeLiteral = 'tăng qua ngưỡng';
+							} else if (entities.side[0].value == 'under') {
+								mode = 'lte';
+								modeLiteral = 'giảm qua ngưỡng';
+							}
+							symbol = entities.symbol[0].value;
+							price = entities.price[0].value;
+							priceWatchApi.priceAlert(symbol, price, mode, senderId).then(function() {
+								fb.sendTextMessage(senderId, `Vâng, em sẽ báo cho ${user.pronounce} ngay khi giá ${symbol} ${modeLiteral} ${price} ạ.`);
+							}, function() {
+
+							});
+							break;
+
 						// TODO: login then query real account data
 						// case 'accountInquiry':
 						// 	fb.sendTextMessage(senderId, `Dạ, ${user.pronounce} muốn xem danh mục đầu tư ạ, ${user.pronounce} vui lòng đợi em một lát ạ...`);
@@ -233,15 +252,12 @@ app.get('/notify', function (req, res) {
 					priceMovement = 'tăng qua'
 					break;
 			}
-			fb.sendTextMessage(req.query.fbId, `Giá ${req.query.symbol} vừa ${priceMovement} ngưỡng ${req.query.price}.`);
+			fb.sendTextMessage(req.query.senderId, `🔔 Giá ${req.query.symbol} vừa ${priceMovement} ngưỡng ${req.query.price}!`);
 			bot.processStockInfo([{value: req.query.symbol}]).then(function(stockInfoData){
-				fb.sendButtonMessage(req.query.fbId, stockInfoData.resultText, stockInfoData.actionButtons);
+				fb.sendButtonMessage(req.query.senderId, stockInfoData.resultText, stockInfoData.actionButtons);
 			});
 			break;
 	}
-
-	console.log(req.query);
-
 });
 
 app.listen(PORT, function() {
