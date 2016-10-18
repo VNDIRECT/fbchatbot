@@ -56,7 +56,12 @@ app.post('/webhook', function (req, res) {
 							fb.sendButtonMessage(senderId, stockInfoData.resultText, stockInfoData.actionButtons);
 						});
 					} else {
-						fb.sendTextMessage(senderId, `Xin lỗi ${user.pronounce} ${user.fbProfile.first_name}, em chưa hiểu yêu cầu của ${user.pronounce}. Em có thể giúp ${user.pronounce} xem giá chứng khoán, giá dầu, giá vàng.\nEm rất mong được phục vụ ${user.pronounce}!`);
+						fb.sendTextMessage(senderId, `Em chưa hiểu ý ${user.pronounce} ${user.fbProfile.first_name}, ${user.pronounce} có thể nói rõ hơn được không ạ? Em có thể hiểu những câu như:\n` +
+							`  • Nhắn cho ${user.pronounce} khi FPT tăng quá 50\n` +
+							`  • Cho tôi xem giá VNM\n` +
+							`  • Giá vàng thế nào rồi nhỉ?\n` +
+							`  • Giá dầu mới nhất\n` +
+							`${user.pronounce} cũng có thể liên hệ với hotline của VNDIRECT theo số 1900-5454-09 hoặc email support@vndirect.com.vn để được trợ giúp tốt hơn ạ.`);
 					}
 				} else {
 					switch(intent.value) {
@@ -71,7 +76,11 @@ app.post('/webhook', function (req, res) {
 							break;
 
 						case 'sayHi':
-							fb.sendTextMessage(senderId, `⭐⭐Chào ${user.pronounce} ${user.fbProfile.first_name} ạ!⭐⭐\nEm là Lan Hương, dịch vụ trả lời tự động của VNDIRECT. Em có thể giúp ${user.pronounce} xem giá chứng khoán, giá dầu, giá vàng.\nRất hân hạnh được phục vụ ${user.pronounce}!`);
+							fb.sendTextMessage(senderId, `⭐⭐ Chào ${user.pronounce} ${user.fbProfile.first_name} ạ!⭐⭐ \nEm là Lan Hương, dịch vụ trả lời tự động của VNDIRECT.\nEm có thể hiểu những yêu cầu như:\n` +
+								`  • Nhắn cho ${user.pronounce} khi FPT tăng quá 50\n` +
+								`  • Cho tôi xem giá VNM\n` +
+								`  • Giá vàng thế nào rồi nhỉ?\n` +
+								`  • Giá dầu mới nhất\nRất hân hạnh được phục vụ ${user.pronounce}!`);
 							break;
 
 						case 'compliment':
@@ -227,7 +236,12 @@ app.post('/webhook', function (req, res) {
 					}
 				}
 			}).catch(function() {
-				fb.sendTextMessage(senderId, `Em chưa hiểu ý ${user.pronounce} ${user.fbProfile.first_name}, ${user.pronounce} có thể nói rõ hơn được không ạ? ${user.pronounce} cũng có thể liên hệ với hotline của VNDIRECT theo số 1900-5454-09 hoặc email support@vndirect.com.vn để được trợ giúp tốt hơn ạ.`);
+				fb.sendTextMessage(senderId, `Em chưa hiểu ý ${user.pronounce} ${user.fbProfile.first_name}, ${user.pronounce} có thể nói rõ hơn được không ạ? Em có thể hiểu những câu như:\n` +
+					`  • Nhắn cho ${user.pronounce} khi FPT tăng quá 50\n` +
+					`  • Cho tôi xem giá VNM\n` +
+					`  • Giá vàng thế nào rồi nhỉ?\n` +
+					`  • Giá dầu mới nhất\n` +
+					`${user.pronounce} cũng có thể liên hệ với hotline của VNDIRECT theo số 1900-5454-09 hoặc email support@vndirect.com.vn để được trợ giúp tốt hơn ạ.`);
 			});
 
 		});
