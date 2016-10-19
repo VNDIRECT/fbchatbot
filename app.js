@@ -56,7 +56,7 @@ app.post('/webhook', function (req, res) {
 							fb.sendButtonMessage(senderId, stockInfoData.resultText, stockInfoData.actionButtons);
 						});
 					} else {
-						fb.sendTextMessage(senderId, `Em chưa hiểu ý ${user.pronounce} ${user.fbProfile.first_name}, ${user.pronounce} có thể nói rõ hơn được không ạ? Em có thể hiểu những câu như:\n` +
+						fb.sendTextMessage(senderId, `Em chưa hiểu ý ${user.pronounce} ${user.fbProfile.first_name}, ${user.pronounce} có thể nói rõ hơn được không ạ? Em có thể thực hiện những yêu cầu như:\n` +
 							`  • Nhắn cho ${user.pronounce} khi FPT tăng quá 50\n` +
 							`  • Cho tôi xem giá VNM\n` +
 							`  • Giá vàng thế nào rồi nhỉ?\n` +
@@ -76,7 +76,7 @@ app.post('/webhook', function (req, res) {
 							break;
 
 						case 'sayHi':
-							fb.sendTextMessage(senderId, `⭐⭐ Chào ${user.pronounce} ${user.fbProfile.first_name} ạ!⭐⭐ \nEm là Lan Hương, dịch vụ trả lời tự động của VNDIRECT.\nEm có thể hiểu những yêu cầu như:\n` +
+							fb.sendTextMessage(senderId, `⭐ Chào ${user.pronounce} ${user.fbProfile.first_name} ạ! ⭐ \nEm là Lan Hương, dịch vụ trả lời tự động của VNDIRECT.\nEm có thể hiểu những yêu cầu như:\n` +
 								`  • Nhắn cho ${user.pronounce} khi FPT tăng quá 50\n` +
 								`  • Cho tôi xem giá VNM\n` +
 								`  • Giá vàng thế nào rồi nhỉ?\n` +
