@@ -135,21 +135,27 @@ app.post('/webhook', function (req, res) {
 							break;
 
 						case 'priceAlert':
-							var mode, modeLiteral, symbol, price;
-							if (entities.side[0].value == 'over') {
-								mode = 'gte';
-								modeLiteral = 'tăng qua ngưỡng';
-							} else if (entities.side[0].value == 'under') {
-								mode = 'lte';
-								modeLiteral = 'giảm qua ngưỡng';
-							}
-							symbol = entities.symbol[0].value;
-							price = entities.price[0].value;
-							priceWatchApi.priceAlert(symbol, price, mode, senderId).then(function() {
-								fb.sendTextMessage(senderId, `Vâng, em sẽ báo cho ${user.pronounce} ngay khi giá ${symbol} ${modeLiteral} ${price} ạ.`);
-							}, function() {
 
-							});
+							if (!entities.symbol || !entities.symbol.length || !entities.side || !entities.side.length || !entities.price || !entities.price.length) {
+								fb.sendTextMessage(senderId, `${user.Pronounce} có thể nói rõ hơn được không ạ? Ví dụ: "Nhắn cho ${user.pronounce} khi FPT tăng quá 50".`);
+							} else {
+
+								var mode, modeLiteral, symbol, price;
+								if (entities.side[0].value == 'over') {
+									mode = 'gte';
+									modeLiteral = 'tăng qua ngưỡng';
+								} else if (entities.side[0].value == 'under') {
+									mode = 'lte';
+									modeLiteral = 'giảm qua ngưỡng';
+								}
+								symbol = entities.symbol[0].value;
+								price = entities.price[0].value;
+								priceWatchApi.priceAlert(symbol, price, mode, senderId).then(function() {
+									fb.sendTextMessage(senderId, `Vâng, em sẽ báo cho ${user.pronounce} ngay khi giá ${symbol} ${modeLiteral} ${price} ạ.`);
+								}, function() {
+
+								});
+							}
 							break;
 
 						// TODO: login then query real account data
