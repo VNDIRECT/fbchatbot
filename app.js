@@ -96,7 +96,7 @@ app.post('/webhook', function (req, res) {
 							break;
 
 						case 'whoAreYou':
-							fb.sendTextMessage(senderId, `Em là Lan Hương, dịch vụ trả lời tự động của VNDIRECT. Em có thể giúp ${user.pronounce} xem giá chứng khoán, giá dầu, giá vàng.\nRất hân hạnh được phục vụ ${user.pronounce}!`);
+							fb.sendTextMessage(senderId, `Em là Lan Hương, dịch vụ trả lời tự động của VNDIRECT. Rất hân hạnh được phục vụ ${user.pronounce}!`);
 							break;
 
 						case 'thank':
