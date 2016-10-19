@@ -46,9 +46,8 @@ app.post('/webhook', function (req, res) {
 		fb.findOrCreateUserSessionInfo(senderId).then(function(user) { // get user session info, including his facebook's profile
 
 			bot.witProcessor(message, senderId).then(function(entities) {
-				var intent = entities.intent ? entities.intent[0] : undefined;
 
-				console.log(entities);
+				var intent = entities.intent ? entities.intent[0] : undefined;
 
 				if (!intent) {
 					if (entities.symbol) { // not sure what the user's intent is, but they mentioned a symbol, so let's respond with some stock info anyway
@@ -60,8 +59,8 @@ app.post('/webhook', function (req, res) {
 							`  • Nhắn cho ${user.pronounce} khi FPT tăng quá 50\n` +
 							`  • Cho tôi xem giá VNM\n` +
 							`  • Giá vàng thế nào rồi nhỉ?\n` +
-							`  • Giá dầu mới nhất\n` +
-							`${user.pronounce} cũng có thể liên hệ với hotline của VNDIRECT theo số 1900-5454-09 hoặc email support@vndirect.com.vn để được trợ giúp tốt hơn ạ.`);
+							`  • Giá dầu mới nhất\n`);
+						fb.sendTextMessage(senderId, `${user.Pronounce} cũng có thể liên hệ với hotline của VNDIRECT theo số 1900-5454-09 hoặc email support@vndirect.com.vn để được trợ giúp tốt hơn ạ.`);
 					}
 				} else {
 					switch(intent.value) {

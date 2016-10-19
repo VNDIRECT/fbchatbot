@@ -44,6 +44,8 @@ function sendTextMessage(recipientId, messageText) {
 		}
 	};
 
+	console.log('messageData', messageData);
+
 	callSendAPI(messageData);
 }
 
@@ -90,7 +92,6 @@ function callSendAPI(messageData) {
 				}
 			} else {
 				console.log(error);
-				console.log(response);
 				console.log(body);
 			}
 		}
